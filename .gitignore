@@ -17,3 +17,6 @@ data/
 
 # Mac
 .DS_Store
+
+# 学习过程的探索脚本,仅本地保留
+clean_data.py
