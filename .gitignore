@@ -20,3 +20,5 @@ data/
 
 # 学习过程的探索脚本,仅本地保留
 clean_data.py
+
+.Rhistory
