@@ -24,3 +24,6 @@ clean_data.py
 .Rhistory
 
 项目全程复盘与知识点总结.md
+
+main.py
+train_tfidf.py
