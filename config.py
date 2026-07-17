@@ -11,7 +11,17 @@
   3. 本文件先于任何实验结果 commit 并 push —— git 时间戳是"事先定死"的唯一证据。
 """
 
+
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATA_DIR = os.environ["PHEME_DATA"]     # 没设就当场 KeyError。
+                                        # 静默回落到 "data" 会让你读到一批不知哪来的文件,
+                                        # 而且照跑不误 —— 那正是最贵的一类错误。
+                                        # Mac: .env 里写 PHEME_DATA=data
+                                        # Colab: PHEME_DATA=/content/... python xxx.py
 
 # ═══ 绝不可改(改了旧结果全部作废) ═══
 
