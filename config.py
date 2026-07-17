@@ -40,4 +40,4 @@ TEST_EVENTS = ["ottawashooting", "putinmissing"]
 
 # 数据目录随机器变(Mac 是 data/,Colab 是 Drive 挂载点),不是实验变量。
 # 写错会当场 FileNotFoundError —— 响亮的错误不需要防,静默的才需要。
-DATA_DIR = os.environ.get("PHEME_DATA", "data")
+DATA_DIR = os.environ["PHEME_DATA"]
