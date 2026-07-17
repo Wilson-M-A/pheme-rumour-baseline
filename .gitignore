@@ -27,3 +27,5 @@ clean_data.py
 
 main.py
 train_tfidf.py
+
+.env
