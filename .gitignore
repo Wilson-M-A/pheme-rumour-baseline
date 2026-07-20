@@ -12,6 +12,9 @@ wheels/
 # IDE
 .idea/
 
+#env
+.env
+
 # data
 /data/*
 !/data/explanations/
@@ -31,3 +34,5 @@ main.py
 train_tfidf.py
 
 .envcaogao.py
+caogao.py
+学习统计.py
