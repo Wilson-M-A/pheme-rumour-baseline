@@ -140,3 +140,39 @@ Two outcomes, interpretations fixed in advance:
   text acting as noise.
 
 No third interpretation will be invented after seeing the number.
+
+## Ablation Result: The Structure Is Not Being Used
+
+One-sided (event split, 5 seeds): macro_f1 = 0.706 ± 0.026
+
+Paired differences (same seed set):
+
+| comparison | mean d | σ_d | verdict |
+|---|---|---|---|
+| one-sided − baseline | +0.001 | 0.025 | within threshold |
+| one-sided − two-sided | +0.001 | 0.048 | within threshold |
+
+All three conditions — raw tweet, tweet + one argument, tweet + two opposing
+arguments — are **indistinguishable in macro_f1** (0.705 / 0.705 / 0.706).
+
+This matches the first pre-registered interpretation. The chain closes:
+removing a full side of argument content changes nothing (one-sided = two-sided),
+and a single side is no better than no argument at all (one-sided = baseline).
+The model is therefore **not reading the argument content** — with zero, one, or
+two sides, it decides the same way. The baseline's style-shortcut failure has
+reappeared one level up: bert-base attends to surface features of the tweet, not
+to the ~90% of the input that is generated argumentation.
+
+Note on variance: the one-sided vs two-sided comparison (σ_d = 0.048) is nearly
+twice as noisy as one-sided vs baseline (σ_d = 0.025). Adding the second side
+does not raise the mean but does inject variance — consistent with the augmented
+result. For bert-base, the LLM-generated text acts as noise, and more of it
+means more instability.
+
+### Answer to the open question
+The competing-wisdom structure is not exploited here because the *judge model is
+too weak to read the arguments*, not because the structure is wrong. This is a
+reverse corroboration of why L-Defense uses an LLM as the reasoner rather than a
+small classifier: the method presupposes a judge that can actually process
+opposing arguments. bert-base cannot, so the structure collapses to its input
+tweet — exactly the baseline.
