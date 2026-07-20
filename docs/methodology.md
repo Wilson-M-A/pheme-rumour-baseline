@@ -92,9 +92,16 @@ Two observations that make the null informative rather than empty:
 
 1. **The near-zero mean is cancellation, not stability.** Per-seed differences
    range from −0.038 to +0.055 — the same treatment helps some runs and hurts
-   others. σ_d (0.036) is *larger* than the baseline single-run σ (0.010),
-   so pairing amplified the variance instead of reducing it. Competing wisdom
-   acts as a high-variance perturbation, not a stable offset.
+   others, suggesting competing wisdom behaves more like a high-variance
+   perturbation than a stable offset (though with n=5, this is a hypothesis,
+   not an established property).
+
+   Note on resolving power: the 0.013 threshold was derived from the baseline's
+   noise (σ ≈ 0.010), but the augmented condition turned out noisier
+   (σ_d = 0.036), so this experiment's *actual* resolving power here is coarser
+   (~0.032). The mean shift (−0.000) sits far inside even this wider band, so the
+   null holds under either figure — and the increased variance is itself a
+   finding, not a nuisance.
 
 2. **recall did not save the result.** rumour_recall moved 0.573 → 0.580,
    well within its own σ (0.065). Per the pre-registered primary metric, this
@@ -104,3 +111,32 @@ Open question (to be addressed by the one-sided ablation): since the input is
 ~90% LLM-generated text and only ~10% tweet, does the model read argument
 *style* rather than *content* — reproducing the same shortcut-learning failure
 seen in the baseline, one level up?
+
+## One-Sided Ablation: Pre-Registered Interpretation (written before running)
+
+Setup: identical to the augmented experiment in every respect (same seeds,
+hyperparameters, MAX_LENGTH=512, dynamic padding, event split, paired analysis)
+except one variable — the NOT RUMOUR slot keeps its label but is emptied of
+content. Input format: `{text} [SEP] RUMOUR: {r_arg} [SEP] NOT RUMOUR:`.
+
+This isolates a single question: **does the model use the argument's *content*,
+or merely the *presence and position* of a second side?** Same primary metric
+and threshold as before (macro_f1, detectable threshold 0.013), compared both
+against baseline and against the two-sided augmented condition.
+
+Two outcomes, interpretations fixed in advance:
+
+- **One-sided ≈ 0.705 (≈ two-sided ≈ baseline):** the model is not reading
+  argument content — it responds only to position/presence, or not at all.
+  This would mean the competing structure is not being exploited, and the
+  baseline's style-shortcut failure has simply reappeared one layer up, on the
+  LLM-generated text. It would give the two-sided null a complete explanation:
+  the structure adds nothing because the model never uses either side's content.
+
+- **One-sided clearly < 0.705:** removing the non-rumour side's content
+  measurably hurts the model, so the opposing content *is* being used. The
+  two-sided null would then read not as "the structure is useless" but as
+  "a real effect exists but is drowned out" — e.g. by the ~90% LLM-generated
+  text acting as noise.
+
+No third interpretation will be invented after seeing the number.
