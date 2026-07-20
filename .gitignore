@@ -13,7 +13,9 @@ wheels/
 .idea/
 
 # data
-data/
+/data/*
+!/data/explanations/
+!/data/explanations/competing_wisdom_minimax_m3.jsonl
 
 # Mac
 .DS_Store
