@@ -112,6 +112,10 @@ Open question (to be addressed by the one-sided ablation): since the input is
 *style* rather than *content* — reproducing the same shortcut-learning failure
 seen in the baseline, one level up?
 
+> **Update (after ablation + reading L-Defense):** the ablation reframed this —
+> see "Answer to the open question" below. The relevant difference turned out to
+> be the missing evidence-retrieval step, not reader strength.
+
 ## One-Sided Ablation: Pre-Registered Interpretation (written before running)
 
 Setup: identical to the augmented experiment in every respect (same seeds,
@@ -141,6 +145,13 @@ Two outcomes, interpretations fixed in advance:
 
 No third interpretation will be invented after seeing the number.
 
+> **Retrospective note:** after running the ablation I checked L-Defense's actual
+> architecture and found its judge is RoBERTa-large (a small encoder, not an LLM).
+> This weakens interpretation A ("not reading") — a same-class model can use these
+> arguments when they are evidence-grounded — and points to the dropped
+> evidence-retrieval step as the more likely cause. The interpretations above are
+> left unedited as the genuine pre-registration; this note records what changed.
+
 ## Ablation Result: The Structure Is Not Being Used
 
 One-sided (event split, 5 seeds): macro_f1 = 0.706 ± 0.026
@@ -155,13 +166,10 @@ Paired differences (same seed set):
 All three conditions — raw tweet, tweet + one argument, tweet + two opposing
 arguments — are **indistinguishable in macro_f1** (0.705 / 0.705 / 0.706).
 
-This matches the first pre-registered interpretation. The chain closes:
-removing a full side of argument content changes nothing (one-sided = two-sided),
-and a single side is no better than no argument at all (one-sided = baseline).
-The model is therefore **not reading the argument content** — with zero, one, or
-two sides, it decides the same way. The baseline's style-shortcut failure has
-reappeared one level up: bert-base attends to surface features of the tweet, not
-to the ~90% of the input that is generated argumentation.
+Removing a full side of argument content changes nothing (one-sided = two-sided),
+and a single side is no better than no argument at all (one-sided = baseline). The
+argument content, in other words, is inert: with zero, one, or two sides, the
+model decides the same way.
 
 Note on variance: the one-sided vs two-sided comparison (σ_d = 0.048) is nearly
 twice as noisy as one-sided vs baseline (σ_d = 0.025). Adding the second side
@@ -170,9 +178,23 @@ result. For bert-base, the LLM-generated text acts as noise, and more of it
 means more instability.
 
 ### Answer to the open question
-The competing-wisdom structure is not exploited here because the *judge model is
-too weak to read the arguments*, not because the structure is wrong. This is a
-reverse corroboration of why L-Defense uses an LLM as the reasoner rather than a
-small classifier: the method presupposes a judge that can actually process
-opposing arguments. bert-base cannot, so the structure collapses to its input
-tweet — exactly the baseline.
+The augmented input is ~90% LLM-generated argumentation, yet removing an entire
+side of it changes nothing (see the ablation above). The most likely reason is
+**not** that bert-base is too weak to read the arguments — L-Defense's own judge
+is a fine-tuned **RoBERTa-large**, a small encoder in the same family as
+bert-base, not an LLM, and it uses such arguments successfully. The difference
+lies elsewhere: L-Defense first runs an **evidence extractor** (RoBERTa-base) so
+its arguer writes over retrieved facts, whereas this project drops that step
+(PHEME has no paired articles) and the arguer reasons from the bare tweet alone.
+
+The arguments are therefore likely uninformative *by construction* — with no
+external evidence to ground them, the arguer only re-describes the tweet, so no
+reader (small or large) can extract new signal. The null is a reverse
+corroboration of why L-Defense includes evidence retrieval, not of any claim
+about judge size.
+
+(Residual caveat: RoBERTa-large is somewhat larger than bert-base, so reader
+capacity cannot be *completely* excluded as a minor factor — but it cannot be the
+main cause, since the working judge is itself a small encoder. Confirming the
+evidence-retrieval hypothesis requires re-running with retrieved evidence; see the
+project README's Future Work.)
